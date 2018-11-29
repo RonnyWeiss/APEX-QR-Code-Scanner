@@ -64,8 +64,8 @@ wwv_flow_api.create_plugin(
 ,p_render_function=>'F_RENDER'
 ,p_substitute_attributes=>true
 ,p_subscribe_plugin_settings=>true
-,p_help_text=>'This Plug-in is used to scan QR Codes.'
-,p_version_identifier=>'1.0'
+,p_help_text=>'This Plug-in is used to scan QR Codes and execute JavaScript or set an APEX Item.'
+,p_version_identifier=>'1.1'
 ,p_about_url=>'https://github.com/RonnyWeiss/APEX-QR-Code-Scanner'
 ,p_files_version=>1121
 );
@@ -133,10 +133,7 @@ wwv_flow_api.create_plugin_attr_value(
 ,p_display_sequence=>10
 ,p_display_value=>'Execute JavaScript'
 ,p_return_value=>'1'
-,p_help_text=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'function execute(text) {',
-'  console.log(text);',
-'}'))
+,p_help_text=>'console.log(scannedValue);'
 );
 wwv_flow_api.create_plugin_attr_value(
  p_id=>wwv_flow_api.id(15241193732663057112)
@@ -144,7 +141,7 @@ wwv_flow_api.create_plugin_attr_value(
 ,p_display_sequence=>20
 ,p_display_value=>'Set APEX Item'
 ,p_return_value=>'2'
-,p_help_text=>'Reference an APEX item that should be set'
+,p_help_text=>'Set Value of an APEX Item'
 );
 wwv_flow_api.create_plugin_attr_value(
  p_id=>wwv_flow_api.id(15644712621459980472)
@@ -152,7 +149,10 @@ wwv_flow_api.create_plugin_attr_value(
 ,p_display_sequence=>30
 ,p_display_value=>'Fire Dynamic Action Event on Region'
 ,p_return_value=>'3'
-,p_help_text=>'The Plug-in has a dynamic Action Event so you can use this mode to use dynamic actions for execute JavaScript or other DA''s'
+,p_help_text=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'The Plug-in has a dynamic Action Event so you can use this mode to use dynamic actions for execute JavaScript or other DA''s',
+'',
+'In DA you can get value by JavaScript this.data and can set an item with JavaScrippt expression and/or do more JavaScript e.g. alert(this.data); or further DA''s'))
 );
 wwv_flow_api.create_plugin_attribute(
  p_id=>wwv_flow_api.id(15241204232486060878)

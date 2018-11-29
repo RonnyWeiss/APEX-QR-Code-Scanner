@@ -1,6 +1,6 @@
 var qrCodeScanner = (function () {
     "use strict";
-    var scriptVersion = "1.0";
+    var scriptVersion = "1.1";
     var util = {
         version: "1.0.1",
         loader: {
