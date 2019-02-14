@@ -1,6 +1,6 @@
 var qrCodeScanner = (function () {
     "use strict";
-    var scriptVersion = "1.1";
+    var scriptVersion = "1.2";
     var util = {
         version: "1.0.1",
         loader: {
@@ -177,7 +177,9 @@ var qrCodeScanner = (function () {
                                         // conver to number when number in correct language string
                                         if (value && value.length > 0 && !isNaN(value)) {
                                             value = parseFloat(value);
-                                            value = value.toLocaleString(apex.locale.getLanguage());
+                                            value = value.toLocaleString(apex.locale.getLanguage(), {
+                                                useGrouping: false
+                                            });
                                         }
 
                                         apex.item(apexItem).setValue(value);
