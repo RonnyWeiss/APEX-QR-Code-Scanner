@@ -1,6 +1,6 @@
-﻿{
+{
     "name": "APEX QR Code Scanner",
-    "version": "1.2",
+    "version": "1.3",
     "description": "This Region Plug-in is used to scan QR Codes. If any string has been detected an APEX Item can be set, Dynamic Action can be fired or JavaScript can be executed. Login for Demo is: user-demo / 123456@",
     "keywords": ["oracle", "apex", "plugin"],
     "homepage": "https://github.com/RonnyWeiss/APEX-QR-Code-Scanner",
@@ -12,6 +12,7 @@
     "author": {
         "name": "Ronny Weiß",
         "email": "wronny@gmx.de",
+        "twitter": "ronny_weiss_",
         "donationUrl": "https://www.paypal.me/RonnyW1"
     },
     "repository": {
@@ -19,9 +20,9 @@
         "url": "https://github.com/RonnyWeiss/APEX-QR-Code-Scanner.git"
     },
     "oracle": {
-        "versions": ["11.2.0.1", "12.1.0.1", "12.2.0.1"],
+        "versions": ["11.2.0.1", "12.1.0.1", "12.2.0.1", "18.4.0.0"],
         "apex": {
-            "versions": ["5.1.0", "5.1.1", "5.1.2", "5.1.3", "5.1.4", "18.1.0", "18.2.0"],
+            "versions": ["5.1.3", "18.1.0.00.45", "18.2.0.00.12"],
             "plugin": {
                 "internalName": "APEX.QR.CODE.SCANNER",
                 "type": "region",

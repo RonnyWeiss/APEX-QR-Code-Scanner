@@ -1,31 +1,48 @@
 var qrCodeScanner = (function () {
     "use strict";
-    var scriptVersion = "1.2";
+    var scriptVersion = "1.3";
     var util = {
-        version: "1.0.1",
+        version: "1.0.5",
+        isAPEX: function () {
+            if (typeof (apex) !== 'undefined') {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        debug: {
+            info: function (str) {
+                if (util.isAPEX()) {
+                    apex.debug.info(str);
+                }
+            },
+            error: function (str) {
+                if (util.isAPEX()) {
+                    apex.debug.error(str);
+                } else {
+                    console.error(str);
+                }
+            }
+        },
         loader: {
             start: function (id) {
-
-                try {
+                if (util.isAPEX()) {
                     apex.util.showSpinner($(id));
-                } catch (e) {
+                } else {
                     /* define loader */
                     var faLoader = $("<span></span>");
                     faLoader.attr("id", "loader" + id);
-                    faLoader.addClass("ct-loader fa-stack fa-3x");
-
-                    /* define circle for loader */
-                    var faCircle = $("<i></i>");
-                    faCircle.addClass("fa fa-circle fa-stack-2x");
-                    faCircle.css("color", "rgba(121,121,121,0.6)");
+                    faLoader.addClass("ct-loader");
 
                     /* define refresh icon with animation */
                     var faRefresh = $("<i></i>");
-                    faRefresh.addClass("fa fa-refresh fa-spin fa-inverse fa-stack-1x");
-                    faRefresh.css("animation-duration", "1.8s");
+                    faRefresh.addClass("fa fa-refresh fa-2x fa-anim-spin");
+                    faRefresh.css("background", "rgba(121,121,121,0.6)");
+                    faRefresh.css("border-radius", "100%");
+                    faRefresh.css("padding", "15px");
+                    faRefresh.css("color", "white");
 
                     /* append loader */
-                    faLoader.append(faCircle);
                     faLoader.append(faRefresh);
                     $(id).append(faLoader);
                 }
@@ -42,7 +59,7 @@ var qrCodeScanner = (function () {
                 try {
                     targetConfig = JSON.parse(targetConfig);
                 } catch (e) {
-                    console.error("Error while try to parse udConfigJSON. Please check your Config JSON. Standard Config will be used.");
+                    console.error("Error while try to parse targetConfig. Please check your Config JSON. Standard Config will be used.");
                     console.error(e);
                     console.error(targetConfig);
                 }
@@ -53,7 +70,7 @@ var qrCodeScanner = (function () {
             try {
                 finalConfig = $.extend(true, srcConfig, targetConfig);
             } catch (e) {
-                console.error('Error while try to merge udConfigJSON into Standard JSON if any attribute is missing. Please check your Config JSON. Standard Config will be used.');
+                console.error('Error while try to merge 2 JSONs into standard JSON if any attribute is missing. Please check your Config JSON. Standard Config will be used.');
                 console.error(e);
                 finalConfig = srcConfig;
                 console.error(finalConfig);
