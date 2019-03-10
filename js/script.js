@@ -1,6 +1,6 @@
 var qrCodeScanner = (function () {
     "use strict";
-    var scriptVersion = "1.3";
+    var scriptVersion = "1.4";
     var util = {
         version: "1.0.5",
         isAPEX: function () {
@@ -59,9 +59,9 @@ var qrCodeScanner = (function () {
                 try {
                     targetConfig = JSON.parse(targetConfig);
                 } catch (e) {
-                    console.error("Error while try to parse targetConfig. Please check your Config JSON. Standard Config will be used.");
-                    console.error(e);
-                    console.error(targetConfig);
+                    util.debug.error("Error while try to parse targetConfig. Please check your Config JSON. Standard Config will be used.");
+                    util.debug.error(e);
+                    util.debug.error(targetConfig);
                 }
             } else {
                 finalConfig = targetConfig;
@@ -70,10 +70,10 @@ var qrCodeScanner = (function () {
             try {
                 finalConfig = $.extend(true, srcConfig, targetConfig);
             } catch (e) {
-                console.error('Error while try to merge 2 JSONs into standard JSON if any attribute is missing. Please check your Config JSON. Standard Config will be used.');
-                console.error(e);
+                util.debug.error('Error while try to merge 2 JSONs into standard JSON if any attribute is missing. Please check your Config JSON. Standard Config will be used.');
+                util.debug.error(e);
                 finalConfig = srcConfig;
-                console.error(finalConfig);
+                util.debug.error(finalConfig);
             }
             return finalConfig;
         }
@@ -107,8 +107,8 @@ var qrCodeScanner = (function () {
 
                 $("#" + regionID).append(canvasElement);
             } catch (e) {
-                console.error("Error while try to create canvas for video frame");
-                console.error(e);
+                util.debug.error("Error while try to create canvas for video frame");
+                util.debug.error(e);
             }
 
             /************************************************************************
@@ -141,8 +141,8 @@ var qrCodeScanner = (function () {
                     requestAnimationFrame(tick);
                 });
             } catch (e) {
-                console.error("Your browser does not support video");
-                console.error(e);
+                util.debug.error("Your browser does not support video");
+                util.debug.error(e);
             }
 
             /************************************************************************
@@ -183,8 +183,8 @@ var qrCodeScanner = (function () {
 
                                         func(code.data);
                                     } catch (e) {
-                                        console.error("Error while execute JavaScript Code!");
-                                        console.error(e);
+                                        util.debug.error("Error while execute JavaScript Code!");
+                                        util.debug.error(e);
                                     }
                                     break;
                                 case "2":
@@ -201,15 +201,15 @@ var qrCodeScanner = (function () {
 
                                         apex.item(apexItem).setValue(value);
                                     } catch (e) {
-                                        console.error("Error while try to set APEX Item!");
-                                        console.error(e);
+                                        util.debug.error("Error while try to set APEX Item!");
+                                        util.debug.error(e);
                                     }
                                     break;
                                 case "3":
                                     apex.event.trigger('#' + regionID, 'qr-code-scanned', code.data);
                                     break;
                                 default:
-                                    console.error("SetMode not found!");
+                                    util.debug.error("SetMode not found!");
                             }
                             bStr = code.data;
                         }
@@ -224,11 +224,28 @@ var qrCodeScanner = (function () {
                 try {
                     requestAnimationFrame(tick);
                 } catch (e) {
-                    console.error("Error while try to scan QR Code");
-                    console.error(e);
+                    util.debug.error("Error while try to scan QR Code");
+                    util.debug.error(e);
                 }
             }
 
+            /* Add control events */
+            $("#" + regionID).on("scannerPause", function () {
+                video.pause();
+                if (setMode == 2) {
+                    apex.item(apexItem).setValue("");
+                }
+            });
+            $("#" + regionID).on("scannerPlay", function () {
+                bStr = "";
+                video.play();
+            });
+            $("#" + regionID).on("resetValue", function () {
+                bStr = "";
+                if (setMode == 2) {
+                    apex.item(apexItem).setValue("");
+                }
+            });
         }
     }
 })();
