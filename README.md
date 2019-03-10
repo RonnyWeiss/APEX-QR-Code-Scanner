@@ -9,7 +9,9 @@ If you don't to know how to install this Plug-in in Apex, please take look at th
 To control the QR Code Scanner you can fire events on th QR Code region.
 
 $("#qrscanner_region").trigger("scannerPause"); => Pause the scanner
+
 $("#qrscanner_region").trigger("scannerPlay"); => Restart the scanner from pause
+
 $("#qrscanner_region").trigger("resetValue"); => Reset value to rescan the same QR Code if needed
 
 For working Demo just click on:
