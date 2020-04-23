@@ -1,8 +1,8 @@
 var qrCodeScanner = (function () {
     "use strict";
-    var scriptVersion = "1.4";
+    var scriptVersion = "1.4.1";
     var util = {
-        version: "1.0.5",
+        version: "1.2.9",
         isAPEX: function () {
             if (typeof (apex) !== 'undefined') {
                 return true;
@@ -25,7 +25,10 @@ var qrCodeScanner = (function () {
             }
         },
         loader: {
-            start: function (id) {
+            start: function (id, setMinHeight) {
+                if (setMinHeight) {
+                    $(id).css("min-height", "100px");
+                }
                 if (util.isAPEX()) {
                     apex.util.showSpinner($(id));
                 } else {
@@ -33,6 +36,9 @@ var qrCodeScanner = (function () {
                     var faLoader = $("<span></span>");
                     faLoader.attr("id", "loader" + id);
                     faLoader.addClass("ct-loader");
+                    faLoader.css("text-align", "center");
+                    faLoader.css("width", "100%");
+                    faLoader.css("display", "block");
 
                     /* define refresh icon with animation */
                     var faRefresh = $("<i></i>");
@@ -47,33 +53,37 @@ var qrCodeScanner = (function () {
                     $(id).append(faLoader);
                 }
             },
-            stop: function (id) {
+            stop: function (id, removeMinHeight) {
+                if (removeMinHeight) {
+                    $(id).css("min-height", "");
+                }
                 $(id + " > .u-Processing").remove();
                 $(id + " > .ct-loader").remove();
             }
         },
         jsonSaveExtend: function (srcConfig, targetConfig) {
             var finalConfig = {};
+            var tmpJSON = {};
             /* try to parse config json when string or just set */
             if (typeof targetConfig === 'string') {
                 try {
-                    targetConfig = JSON.parse(targetConfig);
+                    tmpJSON = JSON.parse(targetConfig);
                 } catch (e) {
-                    util.debug.error("Error while try to parse targetConfig. Please check your Config JSON. Standard Config will be used.");
-                    util.debug.error(e);
-                    util.debug.error(targetConfig);
+                    console.error("Error while try to parse targetConfig. Please check your Config JSON. Standard Config will be used.");
+                    console.error(e);
+                    console.error(targetConfig);
                 }
             } else {
-                finalConfig = targetConfig;
+                tmpJSON = targetConfig;
             }
             /* try to merge with standard if any attribute is missing */
             try {
-                finalConfig = $.extend(true, srcConfig, targetConfig);
+                finalConfig = $.extend(true, srcConfig, tmpJSON);
             } catch (e) {
-                util.debug.error('Error while try to merge 2 JSONs into standard JSON if any attribute is missing. Please check your Config JSON. Standard Config will be used.');
-                util.debug.error(e);
+                console.error('Error while try to merge 2 JSONs into standard JSON if any attribute is missing. Please check your Config JSON. Standard Config will be used.');
+                console.error(e);
                 finalConfig = srcConfig;
-                util.debug.error(finalConfig);
+                console.error(finalConfig);
             }
             return finalConfig;
         }
@@ -132,7 +142,8 @@ var qrCodeScanner = (function () {
             try {
                 navigator.mediaDevices.getUserMedia({
                     video: {
-                        facingMode: config.facingMode
+                        facingMode: config.facingMode,
+                        audio: false
                     }
                 }).then(function (stream) {
                     video.srcObject = stream;
@@ -177,7 +188,7 @@ var qrCodeScanner = (function () {
                         drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, config.scanFrameColor);
                         if (bStr.length != code.data.length) {
                             switch (setMode) {
-                                case "1":
+                                case 1:
                                     try {
                                         var func = new Function("scannedValue", executeCode);
 
@@ -187,7 +198,7 @@ var qrCodeScanner = (function () {
                                         util.debug.error(e);
                                     }
                                     break;
-                                case "2":
+                                case 2:
                                     try {
                                         var value = code.data;
 
@@ -205,8 +216,8 @@ var qrCodeScanner = (function () {
                                         util.debug.error(e);
                                     }
                                     break;
-                                case "3":
-                                    apex.event.trigger('#' + regionID, 'qr-code-scanned', code.data);
+                                case 3:
+                                    $('#' + regionID).trigger('qr-code-scanned', code.data);
                                     break;
                                 default:
                                     util.debug.error("SetMode not found!");
