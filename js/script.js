@@ -1,8 +1,25 @@
 var qrCodeScanner = (function () {
     "use strict";
-    var scriptVersion = "1.4.1";
     var util = {
-        version: "1.2.9",
+        /**********************************************************************************
+         ** required functions 
+         *********************************************************************************/
+        featureInfo: {
+            name: "APEX QR Code Scanner",
+            info: {
+                scriptVersion: "1.4.2",
+                utilVersion: "1.3.5",
+                url: "https://github.com/RonnyWeiss",
+                license: "MIT"
+            }
+        },
+        isDefinedAndNotNull: function (pInput) {
+            if (typeof pInput !== "undefined" && pInput !== null && pInput != "") {
+                return true;
+            } else {
+                return false;
+            }
+        },
         isAPEX: function () {
             if (typeof (apex) !== 'undefined') {
                 return true;
@@ -10,20 +27,51 @@ var qrCodeScanner = (function () {
                 return false;
             }
         },
+        varType: function (pObj) {
+            if (typeof pObj === "object") {
+                var arrayConstructor = [].constructor;
+                var objectConstructor = ({}).constructor;
+                if (pObj.constructor === arrayConstructor) {
+                    return "array";
+                }
+                if (pObj.constructor === objectConstructor) {
+                    return "json";
+                }
+            } else {
+                return typeof pObj;
+            }
+        },
         debug: {
-            info: function (str) {
+            info: function () {
                 if (util.isAPEX()) {
-                    apex.debug.info(str);
+                    var i = 0;
+                    var arr = [];
+                    for (var prop in arguments) {
+                        arr[i] = arguments[prop];
+                        i++;
+                    }
+                    arr.push(util.featureInfo);
+                    apex.debug.info.apply(this, arr);
                 }
             },
-            error: function (str) {
+            error: function () {
+                var i = 0;
+                var arr = [];
+                for (var prop in arguments) {
+                    arr[i] = arguments[prop];
+                    i++;
+                }
+                arr.push(util.featureInfo);
                 if (util.isAPEX()) {
-                    apex.debug.error(str);
+                    apex.debug.error.apply(this, arr);
                 } else {
-                    console.error(str);
+                    console.error.apply(this, arr);
                 }
             }
         },
+        /**********************************************************************************
+         ** optinal functions 
+         *********************************************************************************/
         loader: {
             start: function (id, setMinHeight) {
                 if (setMinHeight) {
@@ -69,21 +117,25 @@ var qrCodeScanner = (function () {
                 try {
                     tmpJSON = JSON.parse(targetConfig);
                 } catch (e) {
-                    console.error("Error while try to parse targetConfig. Please check your Config JSON. Standard Config will be used.");
-                    console.error(e);
-                    console.error(targetConfig);
+                    util.debug.error({
+                        "msg": "Error while try to parse targetConfig. Please check your Config JSON. Standard Config will be used.",
+                        "err": e,
+                        "targetConfig": targetConfig
+                    });
                 }
             } else {
-                tmpJSON = targetConfig;
+                tmpJSON = $.extend(true, {}, targetConfig);
             }
             /* try to merge with standard if any attribute is missing */
             try {
-                finalConfig = $.extend(true, srcConfig, tmpJSON);
+                finalConfig = $.extend(true, {}, srcConfig, tmpJSON);
             } catch (e) {
-                console.error('Error while try to merge 2 JSONs into standard JSON if any attribute is missing. Please check your Config JSON. Standard Config will be used.');
-                console.error(e);
-                finalConfig = srcConfig;
-                console.error(finalConfig);
+                finalConfig = $.extend(true, {}, srcConfig);
+                util.debug.error({
+                    "msg": "Error while try to merge 2 JSONs into standard JSON if any attribute is missing. Please check your Config JSON. Standard Config will be used.",
+                    "err": e,
+                    "finalConfig": finalConfig
+                });
             }
             return finalConfig;
         }
@@ -91,15 +143,30 @@ var qrCodeScanner = (function () {
 
     return {
         /* Initialize function for cards */
-        initialize: function (regionID, configJSON, setMode, executeCode, apexItem) {
-            $("#" + regionID).css("min-height", "140px");
-            util.loader.start("#" + regionID);
+        initialize: function (regionID, configJSON, setMode, executeCode, apexItem, noNumberConvert) {
+
+            util.debug.info({
+                "moule": "initialize",
+                "regionID": regionID,
+                "configJSON": configJSON,
+                "setMode": setMode,
+                "executeCode": executeCode,
+                "apexItem": apexItem
+            });
+
+            util.loader.start("#" + regionID, true);
+
             var defConf = {
                 height: 360,
                 scanFrameColor: "rgba(192,0,15,1)",
                 facingMode: "environment"
             };
             var bStr = "";
+            var numberConversion = true;
+
+            if (noNumberConvert === "Y") {
+                numberConversion = false;
+            }
 
             var config = util.jsonSaveExtend(defConf, configJSON);
 
@@ -117,8 +184,11 @@ var qrCodeScanner = (function () {
 
                 $("#" + regionID).append(canvasElement);
             } catch (e) {
-                util.debug.error("Error while try to create canvas for video frame");
-                util.debug.error(e);
+                util.debug.error({
+                    "module": "initialize",
+                    "msg": "Error while try to create canvas for video frame",
+                    "err": e
+                });
             }
 
             /************************************************************************
@@ -152,8 +222,11 @@ var qrCodeScanner = (function () {
                     requestAnimationFrame(tick);
                 });
             } catch (e) {
-                util.debug.error("Your browser does not support video");
-                util.debug.error(e);
+                util.debug.error({
+                    "module": "initialize",
+                    "msg": "Your browser does not support video or you do not use HTTPS",
+                    "err": e
+                });
             }
 
             /************************************************************************
@@ -194,8 +267,11 @@ var qrCodeScanner = (function () {
 
                                         func(code.data);
                                     } catch (e) {
-                                        util.debug.error("Error while execute JavaScript Code!");
-                                        util.debug.error(e);
+                                        util.debug.error({
+                                            "module": "tick",
+                                            "msg": "Error while execute JavaScript Code!",
+                                            "err": e
+                                        });
                                     }
                                     break;
                                 case 2:
@@ -203,7 +279,7 @@ var qrCodeScanner = (function () {
                                         var value = code.data;
 
                                         // conver to number when number in correct language string
-                                        if (value && value.length > 0 && !isNaN(value)) {
+                                        if (numberConversion && value && value.length > 0 && !isNaN(value)) {
                                             value = parseFloat(value);
                                             value = value.toLocaleString(apex.locale.getLanguage(), {
                                                 useGrouping: false
@@ -235,8 +311,11 @@ var qrCodeScanner = (function () {
                 try {
                     requestAnimationFrame(tick);
                 } catch (e) {
-                    util.debug.error("Error while try to scan QR Code");
-                    util.debug.error(e);
+                    util.debug.error({
+                        "module": "initialize",
+                        "msg": "Error while try to scan QR Code",
+                        "err": e
+                    });
                 }
             }
 
@@ -247,10 +326,12 @@ var qrCodeScanner = (function () {
                     apex.item(apexItem).setValue("");
                 }
             });
+
             $("#" + regionID).on("scannerPlay", function () {
                 bStr = "";
                 video.play();
             });
+
             $("#" + regionID).on("resetValue", function () {
                 bStr = "";
                 if (setMode == 2) {
