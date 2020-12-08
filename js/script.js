@@ -159,7 +159,8 @@ var qrCodeScanner = (function () {
             var defConf = {
                 height: 360,
                 scanFrameColor: "rgba(192,0,15,1)",
-                facingMode: "environment"
+                facingMode: "environment",
+                mirrorScanner: false
             };
             var bStr = "";
             var numberConversion = true;
@@ -190,6 +191,11 @@ var qrCodeScanner = (function () {
                 div.css("display", "block");
                 div.css("margin", "5px auto");
 
+                if (config.mirrorScanner) {
+                    div.css("transform", "rotateY(180deg)");
+                    div.css("-webkit-transform", "rotateY(180deg)o");
+                    div.css("-moz-transform", "rotateY(180deg)");
+                }
 
                 var canvasBuffElement = document.createElement("canvas");
                 $(canvasBuffElement).css("display", "none");
