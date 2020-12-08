@@ -7,7 +7,7 @@ var qrCodeScanner = (function () {
         featureInfo: {
             name: "APEX QR Code Scanner",
             info: {
-                scriptVersion: "1.4.2",
+                scriptVersion: "1.5",
                 utilVersion: "1.3.5",
                 url: "https://github.com/RonnyWeiss",
                 license: "MIT"
@@ -169,6 +169,7 @@ var qrCodeScanner = (function () {
             }
 
             var config = util.jsonSaveExtend(defConf, configJSON);
+            var bounds;
 
             /************************************************************************
              **
@@ -177,12 +178,29 @@ var qrCodeScanner = (function () {
              ***********************************************************************/
             try {
                 var video = document.createElement("video");
-                var canvasElement = document.createElement("canvas");
-                canvasElement.style.display = "block";
-                canvasElement.style.margin = "5px auto";
-                var canvas = canvasElement.getContext("2d");
+                $(video).css("position", "absolute");
+                $(video).css("top", "0");
 
-                $("#" + regionID).append(canvasElement);
+                var canvasElement = document.createElement("canvas");
+                var canvas = canvasElement.getContext("2d");
+                $(canvasElement).css("position", "absolute");
+                $(canvasElement).css("top", "0");
+
+                var div = $("<div></div>");
+                div.css("display", "block");
+                div.css("margin", "5px auto");
+
+
+                var canvasBuffElement = document.createElement("canvas");
+                $(canvasBuffElement).css("display", "none");
+                var canvasBuff = canvasBuffElement.getContext("2d");
+
+                /* add video to dom to prevent ios 14 freeze */
+                $(div).append(video);
+                $(div).append(canvasBuffElement);
+                $(div).append(canvasElement);
+
+                $("#" + regionID).append(div);
             } catch (e) {
                 util.debug.error({
                     "module": "initialize",
@@ -211,12 +229,14 @@ var qrCodeScanner = (function () {
              ***********************************************************************/
             try {
                 navigator.mediaDevices.getUserMedia({
+                    audio: false,
                     video: {
-                        facingMode: config.facingMode,
-                        audio: false
+                        facingMode: config.facingMode
                     }
                 }).then(function (stream) {
                     video.srcObject = stream;
+                    video.setAttribute("autoplay", true);
+                    video.setAttribute("muted", true);
                     video.setAttribute("playsinline", true); // required for iOS to prevent fullscreen
                     video.play();
                     requestAnimationFrame(tick);
@@ -246,15 +266,34 @@ var qrCodeScanner = (function () {
                     if (isNaN(ratio)) {
                         ratio = 4 / 3
                     }
+
                     util.loader.stop("#" + regionID);
+
                     canvasElement.height = config.height;
                     canvasElement.width = config.height * ratio;
-                    canvas.drawImage(video, 0, 0, Math.floor(canvasElement.width), Math.floor(canvasElement.height));
-                    var imageData = canvas.getImageData(0, 0, Math.floor(canvasElement.width), Math.floor(canvasElement.height));
-                    var code = jsQR(imageData.data, imageData.width, imageData.height, {
-                        inversionAttempts: "dontInvert",
-                    });
-                    if (code) {
+                    canvasBuffElement.height = config.height;
+                    canvasBuffElement.width = config.height * ratio;
+                    video.height = config.height;
+                    video.width = config.height * ratio;
+                    $(div).width(config.height * ratio);
+                    $(div).height(config.height);
+
+                    canvasBuff.drawImage(video, 0, 0, Math.floor(canvasElement.width), Math.floor(canvasElement.height));
+                    var imageData = canvasBuff.getImageData(0, 0, Math.floor(canvasElement.width), Math.floor(canvasElement.height));
+                    try {
+                        var code = jsQR(imageData.data, imageData.width, imageData.height, {
+                            inversionAttempts: "dontInvert",
+                        });
+                        bounds = code === null ? null : code.location
+                    } catch (err) {
+                        util.debug({
+                            "module": "tick",
+                            "msg": "Error while execute jsQR Code!",
+                            "err": err
+                        });
+                    }
+
+                    if (bounds !== null) {
                         drawLine(code.location.topLeftCorner, code.location.topRightCorner, config.scanFrameColor);
                         drawLine(code.location.topRightCorner, code.location.bottomRightCorner, config.scanFrameColor);
                         drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, config.scanFrameColor);
@@ -300,6 +339,8 @@ var qrCodeScanner = (function () {
                             }
                             bStr = code.data;
                         }
+                    } else {
+                        canvas.clearRect(0, 0, canvasElement.width, canvasElement.height)
                     }
                 }
 
