@@ -4,17 +4,17 @@
 
 ![Screenshot](https://github.com/RonnyWeiss/APEX-QR-Code-Scanner/blob/master/screenshot.gif?raw=true)
 
-This Region Plug-in is used to scan QR Codes. If any string has been detected an APEX Item can be set, Dynamic Action can be fired or JavaScript can be executed.
+This Region Plug-in is used to scan codes. If any string has been detected an APEX Item can be set, Dynamic Action can be fired or JavaScript can be executed.
+The following formats are supported: QR_CODE, AZTEC, CODABAR, CODE_39, CODE_93, CODE_128, DATA_MATRIX, MAXICODE, ITF, EAN_13, EAN_8, PDF_417, RSS_14, RSS_EXPANDED, UPC_A, UPC_E, UPC_EAN_EXTENSION
 
 If you don't to know how to install this Plug-in in Apex, please take look at the Documentation of Oracle APEX.
 
-To control the QR Code Scanner you can fire events on th QR Code region.
+To control the QR Code Scanner you can fire events on th QR Code region. The following events are supportet:
 
-$("#qrscanner_region").trigger("scannerPause"); => Pause the scanner
-
-$("#qrscanner_region").trigger("scannerPlay"); => Restart the scanner from pause
-
-$("#qrscanner_region").trigger("resetValue"); => Reset value to rescan the same QR Code if needed
+apex.region("region_id").pause(); => stop Scanner Video
+apex.region("region_id").start(); => start Scanner video
+apex.region("region_id").refresh(); => reset the currentValue and the item
+apex.region("region_id").setFacingMode(); => change camera
 
 For working Demo just click on:
 
