@@ -1,6 +1,6 @@
 {
     "name": "APEX QR Code Scanner",
-    "version": "22-12-15",
+    "version": "22.12.15",
     "description": "This Region Plug-in is used to scan QR-Codes, Barcodes and others. If any string has been detected an APEX Item can be set, Dynamic Action can be fired or JavaScript can be executed. The following formats are supported: QR_CODE, AZTEC, CODABAR, CODE_39, CODE_93, CODE_128, DATA_MATRIX, MAXICODE, ITF, EAN_13, EAN_8, PDF_417, RSS_14, RSS_EXPANDED, UPC_A, UPC_E, UPC_EAN_EXTENSION",
     "keywords": ["oracle", "apex", "plugin", "barcode", "code", "scanner", "qr code", "qrcode", "camera"],
     "homepage": "https://github.com/RonnyWeiss/APEX-QR-Code-Scanner",

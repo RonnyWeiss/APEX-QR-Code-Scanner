@@ -5,7 +5,7 @@ const qrCodeScanner = function ( apex, $, Html5Qrcode, Html5QrcodeSupportedForma
         "featureDetails": {
             name: "APEX QR Code Scanner",
             info: {
-                scriptVersion: "22-12-15",
+                scriptVersion: "22.12.15",
                 utilVersion: "22.11.28",
                 url: "https://github.com/RonnyWeiss",
                 license: "MIT"
