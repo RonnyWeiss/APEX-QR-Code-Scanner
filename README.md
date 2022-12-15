@@ -12,8 +12,11 @@ If you don't to know how to install this Plug-in in Apex, please take look at th
 To control the QR Code Scanner you can fire events on th QR Code region. The following events are supportet:
 
 apex.region("region_id").pause(); => stop Scanner Video
+
 apex.region("region_id").start(); => start Scanner video
+
 apex.region("region_id").refresh(); => reset the currentValue and the item
+
 apex.region("region_id").setFacingMode(); => change camera
 
 For working Demo just click on:
