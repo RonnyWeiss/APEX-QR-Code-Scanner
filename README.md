@@ -21,7 +21,7 @@ apex.region("region_id").setFacingMode(); => change camera
 
 For working Demo just click on:
 
-https://APEX.oracle.com/pls/APEX/f?p=103428
+https://apex.oracle.com/pls/apex/f?p=103428
 
 If you like my stuff, donate me a coffee
 
